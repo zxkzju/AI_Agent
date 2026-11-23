@@ -7,6 +7,7 @@ from langgraph.store.postgres import PostgresStore
 from react_agent import ReactAgent
 from memory_utils import summarize_history
 from rag_service import RagSummarizeService 
+from user_store import register_user, verify_user
 import pypdf
 import io
 
@@ -41,30 +42,48 @@ def get_agent_context():
 st.title("智能回复系统")
 st.divider()
 
-# --- 1. 登录逻辑 ---
+# --- 1. 登录/注册逻辑 ---
 if "user_id" not in st.session_state:
     st.session_state["user_id"] = None
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
+def enter_chat(user_name: str, greeting: str):
+    st.session_state["user_id"] = user_name
+    st.session_state["messages"] = [{"role": "assistant", "content": greeting}]
+    st.session_state["summary"] = "无前情提要。" # 重置摘要
+    st.rerun() # 刷新页面进入聊天
+
 # 如果没登录，显示登录框，并终止后续渲染
 if st.session_state["user_id"] is None:
     with st.form("login_form"):
         st.subheader("请登录")
-        username = st.text_input("请输入您的用户 ID:")
-        submit = st.form_submit_button("登录")
-        
-        if submit:
-            if username.strip():
-                st.session_state["user_id"] = username.strip()
-                # 登录成功后，初始化欢迎语
-                st.session_state["messages"] = [
-                    {"role": "assistant", "content": f"你好 {username}！有什么能帮助你的？"}
-                ]
-                st.session_state["summary"] = "无前情提要。" # 重置摘要
-                st.rerun() # 刷新页面进入聊天
+        st.caption("新用户需先注册，注册后才能登录。")
+        username = st.text_input("请输入您的用户名:")
+        password = st.text_input("请输入您的密码:", type="password")
+
+        login_col, register_col = st.columns(2)
+        with login_col:
+            login_btn = st.form_submit_button("登录", use_container_width=True)
+        with register_col:
+            register_btn = st.form_submit_button("注册", use_container_width=True)
+
+        if login_btn or register_btn:
+            user_name = username.strip()
+            if not user_name or not password:
+                st.error("用户名和密码均不能为空！")
+            elif register_btn:
+                ok, err = register_user(user_name, password)
+                if ok:
+                    enter_chat(user_name, f"注册成功，你好 {user_name}！有什么能帮助你的？")
+                else:
+                    st.error(err)
             else:
-                st.error("用户 ID 不能为空！")
+                ok, err = verify_user(user_name, password)
+                if ok:
+                    enter_chat(user_name, f"你好 {user_name}！有什么能帮助你的？")
+                else:
+                    st.error(err)
     st.stop() # 重点：没登录时，停止运行下面的聊天代码
 
 # --- 2. 聊天界面逻辑（登录后才会执行到这里） ---
