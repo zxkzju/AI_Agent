@@ -14,7 +14,7 @@ from langchain_core.messages import HumanMessage
 # ================= 配置 =================
 DB_URI = "postgresql://postgres:postgres@localhost:5432/postgres"
 APP_ID = "1906521915"
-APP_SECRET = "15vZw3tZ2NWWM0Xr" 
+APP_SECRET = os.getenv("APP_SECRET") 
 DASHSCOPE_KEY = os.getenv("DASHSCOPE_API_KEY")
 
 BOT_PERSONA = """
