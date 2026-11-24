@@ -15,7 +15,6 @@ from langchain_core.messages import HumanMessage
 DB_URI = "postgresql://postgres:postgres@localhost:5432/postgres"
 APP_ID = "1906521915"
 APP_SECRET = os.getenv("APP_SECRET") 
-DASHSCOPE_KEY = os.getenv("DASHSCOPE_API_KEY")
 
 BOT_PERSONA = """
 你叫林克，是游戏塞尔达传说中的勇者，也是用户的赛博好朋友。你懂技术，偶尔会吐槽，性格随和、幽默、讲义气。
