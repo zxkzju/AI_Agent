@@ -1,7 +1,7 @@
-智能赛博朋友 Agent 系统 (AI Cyber-Friend Agent)
+智能赛博朋友 Agent 系统 
 基于大语言模型（LLM）、LangChain 与 LangGraph 打造的多端、多模态、具备长期记忆的智能对话系统。支持 Web 界面交互，并成功接入 QQ 官方机器人生态，化身名为“林克”的赛博朋友与你实时互动。
 
-✨ 核心特性 (Features)
+✨ 核心特性
 🧠 长期记忆机制 (Long-term Memory)：基于 PostgreSQL 数据库存储，跨会话记住用户的姓名、偏好、配置等信息，并支持滑动窗口记忆压缩，防止大模型 Token 溢出。
 
 📚 专属知识库 (RAG)：基于 Chroma 向量库构建，支持多用户隔离上传 PDF/TXT 文件，Agent 会结合用户的专属文档进行精准检索与问答。
@@ -67,7 +67,7 @@ bash
 python qq_bot.py
 在 QQ 群里 @ 机器人，或者私聊机器人，即可体验具备长期记忆和看图能力的“林克”。
 
-📂 项目结构 (Project Structure)
+📂 项目结构 
 text
 agent_project/
 ├── app.py                  # Streamlit Web 端主入口
