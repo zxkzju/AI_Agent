@@ -40,16 +40,22 @@ class ReactAgent():
         input_dict = {"messages": messages}
         run_config = {"configurable": {"user_id": user_id}}
         
-        for chunk in self.agent.stream(
-            input_dict, 
-            config=run_config, 
-            stream_mode="values", 
-            context={"report": False}
-        ):
+        for chunk in self.agent.stream(input_dict, config=run_config, stream_mode="values", context={"report": False}):
             latest_message = chunk["messages"][-1]
-            if latest_message.content:
-                yield latest_message.content.strip() + "\n"
-
+            
+            # 只提取 AI 的最终回复，忽略 ToolMessage 等中间状态
+            if latest_message.type == "ai" and latest_message.content:
+                content = latest_message.content.strip()
+                
+                # 【核心过滤】：如果内容包含不该出现的词，或者只包含了系统人设，就跳过
+                if content.startswith("【系统人设】") or content.startswith("【用户") or "用户说：" in content:
+                    continue
+                    
+                # 过滤掉可能存在的思考标签
+                content = content.replace("【思考过程】", "").strip()
+                
+                if content:
+                    yield content + "\n"
 
 
 
